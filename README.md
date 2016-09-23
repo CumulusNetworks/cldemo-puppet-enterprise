@@ -81,20 +81,51 @@ In the terminal that you ran the puppet installer in.
     sudo cp platform_check.bash.erb /opt/puppetlabs/puppet/modules/pe_repo/templates/partials/platform_check.bash.erb
     # this is a workaround until puppet enterprise updates their installer to recognize cumulus linux 3.0
     sudo puppet agent -t
-    ssh leaf01
-    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
-    sudo puppet agent -t
-    sudo systemctl puppet.service start
-    ssh leaf02
-    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
-    sudo puppet agent -t
-    ssh spine01
-    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
-    sudo puppet agent -t
-    ssh spine02
-    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
-    sudo puppet agent -t
+    ssh leaf01 'curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash'
+    ssh leaf02 'curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash'
+    ssh spine01 'curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash'
+    ssh spine02 'curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash'
+    ssh server01 'curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash'
+    ssh server02 'curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash'
+
+    ssh leaf01 'sudo systemctl start puppet.service'
+    ssh leaf02 'sudo systemctl start puppet.service'
+    ssh spine01 'sudo systemctl start puppet.service'
+    ssh spine02 'sudo systemctl start puppet.service'
+
+Navigate to Nodes - Unsigned Certificates to see the nodes you installed the
+agents on (you may need to refresh the page to see them). Accept all of the
+certificates.
+
+![](fig6.png)
+
+
+Configure BGP on all of the agents
+----------------------------------
+Download our puppet manifests that install a BGP fabric over our spines, leaves,
+and servers. We verify connectivity over the fabric by downloading a file from
+a webserver installed on server02.
+
+    cd ~
+    git clone https://github.com/cumulusnetworks/cldemo-automation-puppet
+    cd cldemo-automation-puppet
+    sudo su
+    rm -rf /etc/puppetlabs/code/environments/production
+    ln -s  /home/cumulus/cldemo-automation-puppet/ /etc/puppetlabs/code/environments/production
+    exit
+    ssh leaf01 'sudo puppet agent -t'
+    ssh leaf02 'sudo puppet agent -t'
+    ssh spine01 'sudo puppet agent -t'
+    ssh spine02 'sudo puppet agent -t'
+    ssh server01 'sudo puppet agent -t'
+    ssh server02 'sudo puppet agent -t'
     ssh server01
-    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
-    ssh server02
-    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
+    wget 172.168.2.101
+    exit
+
+After running this test, you can look at the puppet enterprise dashboard and
+see the logs from the applied configuration. You can review the network
+configuration of each switch by looking at the facts of the node, and even
+trigger new Puppet runs from the dashboard.
+
+![](fig7.png)
