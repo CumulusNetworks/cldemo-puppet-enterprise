@@ -27,10 +27,10 @@ Puppet Enterprise to install.
     sudo ./puppet-enterprise-installer
     # press enter to install the webserver
 
-*In a new terminal*
+*In a new terminal, we'll call terminal 2*
 
     ssh -L 9000:localhost:3000 vagrant@localhost -p 2222 -o StrictHostKeyChecking=no
-    vagrant
+    # password is vagrant
 
 Leave this terminal open for the duration of the demo - this creates an SSH
 tunnel that will allow you to use the Puppet website from your host machine.
@@ -51,23 +51,50 @@ anyway.
 
 Don't worry about the validation warnings. Just click on Deploy Now.
 
-After successful installation, switch to the terminal that was running the tunnel.
+After successful installation, switch to terminal 2.
 
     exit
     ssh -L 9000:localhost:443 vagrant@localhost -p 2222 -o StrictHostKeyChecking=no
-    vagrant
+    # password is vagrant
 
 Navigate back to [https://127.0.0.1:9000](https://127.0.0.1:9000) to access
 the Puppet Enterprise dashboard.
 
+![](fig4.png)
+
+
 Configuring Agents
 ------------------
-In the terminal that run the puppet installer in.
+Before you can install the puppet agent on Cumulus, you need to pre-fetch the
+agent package for Debian 8 (Jessie). In the web interface, go to Nodes -
+Classification > Classes, and add the `pe_repo::platform::debian_8_amd64` class.
+Commit the changes. Note that the changes do not take effect until a Puppet
+run, which we trigger in the next step.
+
+![](fig5.png)
+
+In the terminal that you ran the puppet installer in.
 
     cd ~
     git clone https://github.com/cumulusnetworks/cldemo-puppet-enterprise
     cd cldemo-puppet-enterprise
-    sudo cp install.bash /opt/puppetlabs/server/data/packages/public/2016.2.1/install.bash
+    sudo cp platform_check.bash.erb /opt/puppetlabs/puppet/modules/pe_repo/templates/partials/platform_check.bash.erb
     # this is a workaround until puppet enterprise updates their installer to recognize cumulus linux 3.0
     sudo puppet agent -t
+    ssh leaf01
+    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
+    sudo puppet agent -t
+    sudo systemctl puppet.service start
+    ssh leaf02
+    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
+    sudo puppet agent -t
+    ssh spine01
+    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
+    sudo puppet agent -t
+    ssh spine02
+    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
+    sudo puppet agent -t
+    ssh server01
+    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
+    ssh server02
     curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash

@@ -258,7 +258,6 @@ run_agent_install_from_url() {
 
     bash "${t_install_file?}" "${@: 2}" || fail "Error running install script ${t_install_file?}"
 }
-
 ##############################################################################
 # We need to know what the PE platform tag is for this node, which requires
 # digging through a bunch of data to extract it.  This is currently the best
@@ -374,12 +373,12 @@ if [ -z "${PLATFORM_NAME:-""}" -o -z "${PLATFORM_RELEASE:-""}" ]; then
             PLATFORM_NAME=amazon
             PLATFORM_RELEASE=6
         else
-            fail "$(cat /etc/system-release) is not a supported platform for Puppet Enterprise v2016.2.1
+            fail "$(cat /etc/system-release) is not a supported platform for Puppet Enterprise v<%= @pe_version %>
                     Please visit http://links.puppetlabs.com/puppet_enterprise_${PE_LINK_VER?}_platform_support to request support for this platform."
 
         fi
     elif [ -z "${PLATFORM_NAME:-""}" ]; then
-        fail "$(uname -s) is not a supported platform for Puppet Enterprise v2016.2.1
+        fail "$(uname -s) is not a supported platform for Puppet Enterprise v<%= @pe_version %>
             Please visit http://links.puppetlabs.com/puppet_enterprise_${PE_LINK_VER?}_platform_support to request support for this platform."
     fi
 fi
@@ -435,7 +434,3 @@ fi
 
 # This is the end of the code copied from the upstream installer.
 ##############################################################################
-
-
-
-run_agent_install_from_url "https://oob-mgmt-server.lab.local:8140/packages/2016.2.1/${PLATFORM_TAG}.bash" "$@"
