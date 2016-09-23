@@ -20,37 +20,33 @@ Puppet Enterprise to install.
     vagrant up oob-mgmt-server oob-mgmt-switch leaf01 leaf02 spine01 spine02 server01 server02
     vagrant ssh oob-mgmt-server
     sudo su - cumulus
-    sudo apt-get install software-properties-common
-    sudo apt-add-repository ppa:ansible/ansible
-    sudo apt-get update
-    sudo apt-get install ansible
-    wget https://releases.ansible.com/awx/setup/ansible-tower-setup-latest.tar.gz
-    tar xvzf ansible-tower-setup-latest.tar.gz
-    cd ansible-tower-setup-*
-    # edit ./inventory and set all of the fields with a password to 'vagrant'
-    sed -i "s/password=''/password='vagrant'/g" inventory
-    sudo ./setup.sh
-    git clone https://github.com/cumulusnetworks/cldemo-ansible-tower
+    wget 'https://pm.puppetlabs.com/cgi-bin/download.cgi?dist=ubuntu&rel=16.04&arch=amd64&ver=latest' -O puppet-enterprise.tar.gz
+    wget -O - https://downloads.puppetlabs.com/puppetlabs-gpg-signing-key.pub | gpg --import
+    tar xvf puppet-enterprise.tar.gz
+    cd puppet-enterprise-*
+    sudo ./puppet-enterprise-installer
+    # press enter to install the webserver
 
 *In a new terminal*
 
-    ssh -L 9000:localhost:443 vagrant@localhost -p 2222 -o StrictHostKeyChecking=no
+    ssh -L 9000:localhost:3000 vagrant@localhost -p 2222 -o StrictHostKeyChecking=no
     vagrant
 
 Leave this terminal open for the duration of the demo - this creates an SSH
 tunnel that will allow you to use the Puppet website from your host machine.
-In Firefox or Chrome, navigate to [https://localhost:9000](https://localhost:9000).
+In Firefox or Chrome, navigate to [https://127.0.0.1:9000](https://127.0.0.1:9000).
 You will receive an error message stating that your connection is not secure.
 Go to Advanced and either add an exception or tell it to proceed to localhost
 anyway.
+
+ * Choose Monolithic Install.
+ * Set the FQDN to oob-mgmt-server.lab.local
+ * Set the admin password to `CumulusLinux!`
 
 ![](fig1.png)
 
 ![](fig2.png)
 
-Your username is `admin` and your password is `vagrant`
+![](fig3.png)
 
-When it asks for a license file, copy and paste your license file from
-Red Hat in the box. If you don't have a license, click on the button to
-receive a free trial license that can be used for evaluation purposes or in
-installations of up to 10 nodes (which is sufficient for these demo purposes).
+Don't worry about the validation warnings. Just click on Deploy Now.
