@@ -10,13 +10,13 @@ Copy the download URL for the Puppet Enterprise Master for Ubuntu 16.04.
 Installing Puppet Enterprise
 ----------------------------
 The reference topology by default only gives 1G of RAM to the `oob-mgmt-server`.
-You will need to increase the RAM for the `oob-mgmt-server` to 2G in order for
+You will need to increase the RAM for the `oob-mgmt-server` to 3G in order for
 Puppet Enterprise to install.
 
     git clone https://github.com/cumulusnetworks/cldemo-vagrant
     cd cldemo-vagrant
     # edit Vagrantfile and replace v.memory for the oob-mgmt-server from 1024 to 2048
-    sed -i 's/v.memory = 1048/v.memory = 2048/g' Vagrantfile
+    sed -i 's/v.memory = 1048/v.memory = 3072/g' Vagrantfile
     vagrant up oob-mgmt-server oob-mgmt-switch leaf01 leaf02 spine01 spine02 server01 server02
     vagrant ssh oob-mgmt-server
     sudo su - cumulus
@@ -50,3 +50,24 @@ anyway.
 ![](fig3.png)
 
 Don't worry about the validation warnings. Just click on Deploy Now.
+
+After successful installation, switch to the terminal that was running the tunnel.
+
+    exit
+    ssh -L 9000:localhost:443 vagrant@localhost -p 2222 -o StrictHostKeyChecking=no
+    vagrant
+
+Navigate back to [https://127.0.0.1:9000](https://127.0.0.1:9000) to access
+the Puppet Enterprise dashboard.
+
+Configuring Agents
+------------------
+In the terminal that run the puppet installer in.
+
+    cd ~
+    git clone https://github.com/cumulusnetworks/cldemo-puppet-enterprise
+    cd cldemo-puppet-enterprise
+    sudo cp install.bash /opt/puppetlabs/server/data/packages/public/2016.2.1/install.bash
+    # this is a workaround until puppet enterprise updates their installer to recognize cumulus linux 3.0
+    sudo puppet agent -t
+    curl -k https://oob-mgmt-server.lab.local:8140/packages/current/install.bash | sudo bash
