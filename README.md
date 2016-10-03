@@ -16,7 +16,7 @@ Puppet Enterprise to install.
     git clone https://github.com/cumulusnetworks/cldemo-vagrant
     cd cldemo-vagrant
     # edit Vagrantfile and replace v.memory for the oob-mgmt-server from 1024 to 2048
-    sed -i 's/v.memory = 1048/v.memory = 3072/g' Vagrantfile
+    sed -i 's/v.memory = 1024/v.memory = 3072/g' Vagrantfile
     vagrant up oob-mgmt-server oob-mgmt-switch leaf01 leaf02 spine01 spine02 server01 server02
     vagrant ssh oob-mgmt-server
     sudo su - cumulus
