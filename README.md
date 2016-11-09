@@ -9,9 +9,11 @@ Copy the download URL for the Puppet Enterprise Master for Ubuntu 16.04.
 
 Installing Puppet Enterprise
 ----------------------------
+Before running this demo, install [VirtualBox](https://www.virtualbox.org/wiki/Download_Old_Builds) and [Vagrant](https://releases.hashicorp.com/vagrant/). The currently supported versions of VirtualBox and Vagrant can be found on the [cldemo-vagrant](https://github.com/cumulusnetworks/cldemo-vagrant).
+
 The reference topology by default only gives 1G of RAM to the `oob-mgmt-server`.
 You will need to increase the RAM for the `oob-mgmt-server` to 3G in order for
-Puppet Enterprise to install.
+Puppet Enterprise to install. This is done in the `sed` line below.
 
     git clone https://github.com/cumulusnetworks/cldemo-vagrant
     cd cldemo-vagrant
